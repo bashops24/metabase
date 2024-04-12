@@ -18,7 +18,7 @@ export const PublicError = () => {
       >
         <NoDataError mb="1rem" />
         <div className={cx(CS.mt1, CS.h4, CS.smH3, CS.mdH2, CS.textBold)}>
-          {message}
+          {message.toString()}
         </div>
       </div>
     </EmbedFrame>

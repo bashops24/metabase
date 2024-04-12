@@ -123,7 +123,7 @@ function EmbedFrame({
   setParameterValue,
   setParameterValueToDefault,
   enableParameterRequiredBehavior,
-}: Props) {
+}: React.PropsWithChildren<Props>) {
   const [hasFrameScroll, setHasFrameScroll] = useState(true);
   const [hasInnerScroll, setHasInnerScroll] = useState(
     document.documentElement.scrollTop > 0,
