@@ -188,4 +188,6 @@ export const data = {
   twoBarsTwoAreasOneLineLog,
   barFormattingFull,
   yAxisCompactWithoutDataLabels,
+  comboStackedBarsAreasNormalized,
+  comboStackedBarsAreas,
 };
