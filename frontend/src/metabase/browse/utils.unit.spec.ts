@@ -1,8 +1,10 @@
+import type { ModelResult } from "metabase-types/api";
+import {
+  createMockCollection,
+  createMockModelResult,
+} from "metabase-types/api/mocks";
 import { defaultRootCollection } from "metabase/admin/permissions/pages/CollectionPermissionsPage/tests/setup";
-import type { SearchResult, ModelResult } from "metabase-types/api";
-import { createMockCollection } from "metabase-types/api/mocks";
 
-import { createMockModelResult } from "./test-utils";
 import type { ActualModelFilters, AvailableModelFilters } from "./utils";
 import { filterModels } from "./utils";
 
@@ -186,16 +188,16 @@ describe("Browse utils", () => {
   }));
   const availableModelFilters: AvailableModelFilters = {
     onlyRed: {
-      predicate: (model: SearchResult) => model.name.startsWith("red"),
+      predicate: (model: ModelResult) => model.name.startsWith("red"),
       activeByDefault: false,
     },
     onlyGood: {
-      predicate: (model: SearchResult) =>
+      predicate: (model: ModelResult) =>
         Boolean(model.moderated_status?.startsWith("good")),
       activeByDefault: false,
     },
     onlyBig: {
-      predicate: (model: SearchResult) =>
+      predicate: (model: ModelResult) =>
         Boolean(model.description?.startsWith("big")),
       activeByDefault: true,
     },
@@ -212,7 +214,7 @@ describe("Browse utils", () => {
       onlyRedAndGood,
       availableModelFilters,
     );
-    const everySixthModel = diverseModels.reduce<SearchResult[]>(
+    const everySixthModel = diverseModels.reduce<ModelResult[]>(
       (acc, model, index) => {
         return index % 6 === 0 ? [...acc, model] : acc;
       },

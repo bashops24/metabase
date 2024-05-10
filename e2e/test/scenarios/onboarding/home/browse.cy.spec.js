@@ -79,11 +79,46 @@ describeWithSnowplow("scenarios > browse", () => {
 
   it("on an open-source instance, the Browse models page has no controls for setting filters", () => {
     cy.visit("/");
-    cy.findByRole("listitem", { name: "Browse models" }).click();
+    navigationSidebar().findByLabelText("Browse models").click();
     cy.findByRole("button", { name: /filter icon/i }).should("not.exist");
     cy.findByRole("switch", { name: /Only show verified models/ }).should(
       "not.exist",
     );
+  });
+
+  it("shows recently viewed models", () => {
+    cy.log("Make several models, enough that recents are displayed");
+    new Array(10).fill().forEach((_, i) => {
+      cy.createQuestion({
+        name: `Model ${i}`,
+        query: {
+          "source-table": ORDERS_MODEL_ID,
+          limit: 10,
+        },
+        type: "model",
+      });
+    });
+
+    cy.visit("/");
+    navigationSidebar().findByLabelText("Browse models").click();
+
+    cy.log("Model 1 is on the page");
+    cy.findByRole("heading", { name: "Model 1" }).should("exist");
+
+    cy.log("Model 1 is not in the Recents section");
+    cy.findByRole("heading", { name: "Recents" }).within(() => {
+      cy.findByRole("heading", { name: "Model 1" }).should("not.exist");
+    });
+
+    cy.log("Visit Model 1");
+    cy.findByRole("heading", { name: "Model 1" }).click();
+
+    cy.visit("/");
+    navigationSidebar().findByLabelText("Browse models").click();
+
+    cy.findByRole("heading", { name: "Recents" }).within(() => {
+      cy.findByRole("heading", { name: "Model 1" }).should("exist");
+    });
   });
 });
 

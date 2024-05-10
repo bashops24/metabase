@@ -2,6 +2,7 @@ import { useState } from "react";
 import { push } from "react-router-redux";
 import { t } from "ttag";
 
+import NoResults from "assets/img/no_results.svg";
 import EntityItem from "metabase/components/EntityItem";
 import {
   SortableColumnHeader,
@@ -16,20 +17,23 @@ import {
 } from "metabase/components/ItemsTable/BaseItemsTable.styled";
 import { Columns, SortDirection } from "metabase/components/ItemsTable/Columns";
 import type { ResponsiveProps } from "metabase/components/ItemsTable/utils";
+import { DelayedLoadingAndErrorWrapper } from "metabase/components/LoadingAndErrorWrapper/DelayedLoadingAndErrorWrapper";
 import { Ellipsified } from "metabase/core/components/Ellipsified";
 import { color } from "metabase/lib/colors";
 import { useDispatch, useSelector } from "metabase/lib/redux";
 import * as Urls from "metabase/lib/urls";
 import { getLocale } from "metabase/setup/selectors";
-import { Icon, type IconProps } from "metabase/ui";
-import type { ModelResult } from "metabase-types/api";
+import { Box, Icon, type IconProps } from "metabase/ui";
 
 import { trackModelClick } from "../analytics";
+import type { ModelResult } from "../types";
 import { getCollectionName, getIcon } from "../utils";
 
+import { CenteredEmptyState } from "./BrowseContainer.styled";
 import { CollectionBreadcrumbsWithTooltip } from "./CollectionBreadcrumbsWithTooltip";
 import { EllipsifiedWithMarkdownTooltip } from "./EllipsifiedWithMarkdownTooltip";
 import {
+  LoadingAndErrorWrapperTableRow,
   ModelCell,
   ModelNameColumn,
   ModelTableRow,
@@ -38,6 +42,8 @@ import { getModelDescription, sortModels } from "./utils";
 
 export interface ModelsTableProps {
   models: ModelResult[];
+  error?: any;
+  isLoading?: boolean;
 }
 
 export const itemsTableContainerName = "ItemsTableContainer";
@@ -57,7 +63,7 @@ const DEFAULT_SORTING_OPTIONS: SortingOptions = {
   sort_direction: SortDirection.Asc,
 };
 
-export const ModelsTable = ({ models }: ModelsTableProps) => {
+export const ModelsTable = ({ models, error, isLoading }: ModelsTableProps) => {
   const locale = useSelector(getLocale);
   const localeCode: string | undefined = locale?.code;
 
@@ -70,6 +76,22 @@ export const ModelsTable = ({ models }: ModelsTableProps) => {
   /** The name column has an explicitly set width. The remaining columns divide the remaining width. This is the percentage allocated to the collection column */
   const collectionWidth = 38.5;
   const descriptionWidth = 100 - collectionWidth;
+
+  if (models?.length === 0) {
+    return (
+      <CenteredEmptyState
+        title={<Box mb=".5rem">{t`No models here yet`}</Box>}
+        message={
+          <Box maw="24rem">{t`Models help curate data to make it easier to find answers to questions all in one place.`}</Box>
+        }
+        illustrationElement={
+          <Box mb=".5rem">
+            <img src={NoResults} />
+          </Box>
+        }
+      />
+    );
+  }
 
   return (
     <Table>
@@ -126,9 +148,20 @@ export const ModelsTable = ({ models }: ModelsTableProps) => {
         </tr>
       </thead>
       <TBody>
-        {sortedModels.map((model: ModelResult) => (
-          <TBodyRow model={model} key={`${model.model}-${model.id}`} />
-        ))}
+        {error || isLoading ? (
+          <LoadingAndErrorWrapperTableRow>
+            <td colSpan={5}>
+              <DelayedLoadingAndErrorWrapper
+                error={error}
+                loading={!!isLoading}
+              />
+            </td>
+          </LoadingAndErrorWrapperTableRow>
+        ) : (
+          sortedModels.map((model: ModelResult) => (
+            <TBodyRow model={model} key={`${model.model}-${model.id}`} />
+          ))
+        )}
       </TBody>
     </Table>
   );

@@ -2,12 +2,9 @@ import { t } from "ttag";
 
 import type { SortingOptions } from "metabase/components/ItemsTable/BaseItemsTable";
 import { SortDirection } from "metabase/components/ItemsTable/Columns";
-import type {
-  CollectionEssentials,
-  ModelResult,
-  SearchResult,
-} from "metabase-types/api";
+import type { CollectionEssentials } from "metabase-types/api";
 
+import type { ModelResult } from "../types";
 import { getCollectionName } from "../utils";
 
 import { pathSeparatorChar } from "./constants";
@@ -36,15 +33,8 @@ export const getBreadcrumbMaxWidths = (
   ];
 };
 
-export const isModel = (item: SearchResult) => item.model === "dataset";
-
-export const getModelDescription = (item: SearchResult) => {
-  if (item.collection && isModel(item) && !item.description?.trim()) {
-    return t`A model`;
-  } else {
-    return item.description;
-  }
-};
+export const getModelDescription = (item: ModelResult) =>
+  item.description?.trim() ? item.description : t`A model`;
 
 export const getCollectionPathString = (collection: CollectionEssentials) => {
   const ancestors: CollectionEssentials[] =
@@ -61,7 +51,7 @@ const getValueForSorting = (
   sort_column: keyof ModelResult,
 ): string => {
   if (sort_column === "collection") {
-    return getCollectionPathString(model.collection);
+    return model.collection ? getCollectionPathString(model.collection) : "";
   } else {
     return model[sort_column];
   }
@@ -108,4 +98,17 @@ export const sortModels = (
 
     return sort_direction === SortDirection.Asc ? result : -result;
   });
+};
+
+export const getCountOfRecentlyViewedModelsToShow = (
+  /** How many models the user has permission to see (ignoring Metabase analytics models which are never shown) */
+  modelCount: number,
+) => {
+  if (modelCount > 20) {
+    return 8;
+  }
+  if (modelCount > 9) {
+    return 4;
+  }
+  return 0;
 };

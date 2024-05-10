@@ -9,7 +9,9 @@ import {
 } from "metabase/collections/utils";
 import { entityForObject } from "metabase/lib/schema";
 import type { IconName } from "metabase/ui";
-import type { CollectionEssentials, ModelResult } from "metabase-types/api";
+import type { CollectionEssentials } from "metabase-types/api";
+
+import type { ModelResult } from "./types";
 
 export const getCollectionName = (collection: CollectionEssentials) => {
   if (isRootCollection(collection)) {

@@ -37,3 +37,9 @@ export const ModelNameColumn = styled(TableColumn)`
     width: 200px;
   }
 `;
+
+export const LoadingAndErrorWrapperTableRow = styled.tr`
+  :hover {
+    background-color: inherit !important;
+  }
+`;

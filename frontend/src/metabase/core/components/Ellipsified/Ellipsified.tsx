@@ -6,7 +6,7 @@ import { useIsTruncated } from "metabase/hooks/use-is-truncated";
 
 import { EllipsifiedRoot } from "./Ellipsified.styled";
 
-interface EllipsifiedProps {
+export interface EllipsifiedProps {
   style?: CSSProperties;
   className?: string;
   showTooltip?: boolean;

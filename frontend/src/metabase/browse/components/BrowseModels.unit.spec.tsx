@@ -1,21 +1,29 @@
 import {
+  setupRecentViewsEndpoints,
   setupSearchEndpoints,
   setupSettingsEndpoints,
 } from "__support__/server-mocks";
-import { renderWithProviders, screen } from "__support__/ui";
+import { renderWithProviders, screen, waitFor, within } from "__support__/ui";
 import { defaultRootCollection } from "metabase/admin/permissions/pages/CollectionPermissionsPage/tests/setup";
-import type { SearchResult } from "metabase-types/api";
-import { createMockCollection } from "metabase-types/api/mocks";
+import {
+  createMockCollection,
+  createMockModelResult,
+  createMockSearchResult,
+} from "metabase-types/api/mocks";
 import { createMockSetupState } from "metabase-types/store/mocks";
 
-import { createMockModelResult } from "../test-utils";
+import type { ModelResult, RecentModel } from "../types";
 
 import { BrowseModels } from "./BrowseModels";
 
-const setup = (modelCount: number) => {
+const setup = (
+  modelCount: number,
+  recentlyViewedModels: RecentModel[] = [],
+) => {
   const models = mockModels.slice(0, modelCount);
-  setupSearchEndpoints(models);
+  setupSearchEndpoints(models.map(model => createMockSearchResult(model)));
   setupSettingsEndpoints([]);
+  setupRecentViewsEndpoints(recentlyViewedModels);
   return renderWithProviders(<BrowseModels />, {
     storeInitialState: {
       setup: createMockSetupState({
@@ -88,7 +96,7 @@ const collectionGrande = createMockCollection({
   ],
 });
 
-const mockModels: SearchResult[] = [
+const mockModels: ModelResult[] = [
   {
     id: 0,
     name: "Model 0",
@@ -284,5 +292,24 @@ describe("BrowseModels", () => {
     expect(
       await screen.findAllByTestId("breadcrumbs-for-collection: Alpha"),
     ).toHaveLength(3);
+  });
+
+  it("displays recently viewed models", async () => {
+    setup(25, mockModels.slice(10, 15) as RecentModel[]);
+    expect(await screen.findByText("Model 1")).toBeInTheDocument();
+    const getGrid = async () =>
+      await screen.findByRole("grid", { name: /Recents/ });
+    await waitFor(async () => {
+      expect(
+        await within(await getGrid()).findByText("Model 10"),
+      ).toBeInTheDocument();
+    });
+    const grid = await getGrid();
+    expect(await within(grid).findByText("Model 11")).toBeInTheDocument();
+    expect(await within(grid).findByText("Model 12")).toBeInTheDocument();
+    expect(await within(grid).findByText("Model 13")).toBeInTheDocument();
+    expect(await within(grid).findByText("Model 14")).toBeInTheDocument();
+    expect(within(grid).queryByText("Model 9")).not.toBeInTheDocument();
+    expect(within(grid).queryByText("Model 15")).not.toBeInTheDocument();
   });
 });
