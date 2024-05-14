@@ -480,3 +480,34 @@ export const getWaterfallLabelFormatter = (
 
   return { formatter, isCompact };
 };
+
+export const getWaterfallLabelFormatter = (
+  seriesModel: SeriesModel,
+  dataset: ChartDataset,
+  settings: ComputedVisualizationSettings,
+  renderingContext: RenderingContext,
+): LabelFormatter | undefined => {
+  const getValue = (datum: Datum) => datum[WATERFALL_VALUE_KEY];
+  const isCompact = shouldRenderCompact(
+    dataset,
+    getValue,
+    seriesModel,
+    settings,
+    renderingContext,
+  );
+
+  const hasDataLabels = settings["graph.show_values"];
+
+  if (!hasDataLabels) {
+    return;
+  }
+
+  return cachedFormatter((value: RowValue) => {
+    return renderingContext.formatValue(value, {
+      ...(settings.column?.(seriesModel.column) ?? {}),
+      jsx: false,
+      compact: isCompact,
+      negativeInParentheses: true,
+    });
+  });
+};
