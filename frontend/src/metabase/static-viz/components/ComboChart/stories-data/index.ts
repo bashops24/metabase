@@ -190,4 +190,7 @@ export const data = {
   yAxisCompactWithoutDataLabels,
   comboStackedBarsAreasNormalized,
   comboStackedBarsAreas,
+  twoBarsTwoAreasOneLineLinear,
+  twoBarsTwoAreasOneLinePower,
+  twoBarsTwoAreasOneLineLog,
 };
