@@ -91,7 +91,6 @@ export function getDataLabelFormatter(
 
   return (params: CallbackDataParams) => {
     const value = (params.data as Datum)[accessKey];
-
     if (typeof value !== "number") {
       return " ";
     }
@@ -103,12 +102,11 @@ export const buildEChartsLabelOptions = (
   seriesModel: SeriesModel,
   yAxisScaleTransforms: NumericAxisScaleTransforms,
   renderingContext: RenderingContext,
-  formatter?: LabelFormatter,
+  formatter: LabelFormatter,
   position?: "top" | "bottom" | "inside",
 ): SeriesLabelOption => {
   return {
     silent: true,
-    show: !!formatter,
     position,
     opacity: 1,
     fontFamily: renderingContext.fontFamily,
@@ -117,9 +115,11 @@ export const buildEChartsLabelOptions = (
     color: renderingContext.getColor("text-dark"),
     textBorderColor: renderingContext.getColor("white"),
     textBorderWidth: 3,
-    formatter:
-      formatter &&
-      getDataLabelFormatter(seriesModel, yAxisScaleTransforms, formatter),
+    formatter: getDataLabelFormatter(
+      seriesModel,
+      yAxisScaleTransforms,
+      formatter,
+    ),
   };
 };
 
@@ -214,12 +214,14 @@ const buildEChartsBarSeries = (
       y: seriesModel.dataKey,
       x: X_AXIS_DATA_KEY,
     },
-    label: buildEChartsLabelOptions(
-      seriesModel,
-      yAxisScaleTransforms,
-      renderingContext,
-      labelFormatter,
-    ),
+    label: !labelFormatter
+      ? undefined
+      : buildEChartsLabelOptions(
+          seriesModel,
+          yAxisScaleTransforms,
+          renderingContext,
+          labelFormatter,
+        ),
     labelLayout: getBarLabelLayout(dataset, settings, seriesModel.dataKey),
     itemStyle: {
       color: seriesModel.color,
@@ -341,13 +343,15 @@ const buildEChartsLineAreaSeries = (
       y: seriesModel.dataKey,
       x: X_AXIS_DATA_KEY,
     },
-    label: buildEChartsLabelOptions(
-      seriesModel,
-      yAxisScaleTransforms,
-      renderingContext,
-      labelFormatter,
-      "top",
-    ),
+    label: labelFormatter
+      ? buildEChartsLabelOptions(
+          seriesModel,
+          yAxisScaleTransforms,
+          renderingContext,
+          labelFormatter,
+          "top",
+        )
+      : undefined,
     labelLayout: {
       hideOverlap: settings["graph.label_value_frequency"] === "fit",
     },

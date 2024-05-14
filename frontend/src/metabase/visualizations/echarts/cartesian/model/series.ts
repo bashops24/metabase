@@ -1,6 +1,7 @@
 import _ from "underscore";
 
 import { NULL_DISPLAY_VALUE } from "metabase/lib/constants";
+import type { OptionsType } from "metabase/lib/formatting/types";
 import { getDatasetKey } from "metabase/visualizations/echarts/cartesian/model/dataset";
 import type {
   ChartDataset,
