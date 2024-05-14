@@ -102,7 +102,7 @@ export const buildEChartsLabelOptions = (
   seriesModel: SeriesModel,
   yAxisScaleTransforms: NumericAxisScaleTransforms,
   renderingContext: RenderingContext,
-  formatter: LabelFormatter,
+  formatter?: LabelFormatter,
   position?: "top" | "bottom" | "inside",
 ): SeriesLabelOption => {
   return {
@@ -115,11 +115,9 @@ export const buildEChartsLabelOptions = (
     color: renderingContext.getColor("text-dark"),
     textBorderColor: renderingContext.getColor("white"),
     textBorderWidth: 3,
-    formatter: getDataLabelFormatter(
-      seriesModel,
-      yAxisScaleTransforms,
-      formatter,
-    ),
+    formatter:
+      formatter &&
+      getDataLabelFormatter(seriesModel, yAxisScaleTransforms, formatter),
   };
 };
 
@@ -214,14 +212,12 @@ const buildEChartsBarSeries = (
       y: seriesModel.dataKey,
       x: X_AXIS_DATA_KEY,
     },
-    label: !labelFormatter
-      ? undefined
-      : buildEChartsLabelOptions(
-          seriesModel,
-          yAxisScaleTransforms,
-          renderingContext,
-          labelFormatter,
-        ),
+    label: buildEChartsLabelOptions(
+      seriesModel,
+      yAxisScaleTransforms,
+      renderingContext,
+      labelFormatter,
+    ),
     labelLayout: getBarLabelLayout(dataset, settings, seriesModel.dataKey),
     itemStyle: {
       color: seriesModel.color,
@@ -343,15 +339,13 @@ const buildEChartsLineAreaSeries = (
       y: seriesModel.dataKey,
       x: X_AXIS_DATA_KEY,
     },
-    label: labelFormatter
-      ? buildEChartsLabelOptions(
-          seriesModel,
-          yAxisScaleTransforms,
-          renderingContext,
-          labelFormatter,
-          "top",
-        )
-      : undefined,
+    label: buildEChartsLabelOptions(
+      seriesModel,
+      yAxisScaleTransforms,
+      renderingContext,
+      labelFormatter,
+      "top",
+    ),
     labelLayout: {
       hideOverlap: settings["graph.label_value_frequency"] === "fit",
     },
@@ -604,7 +598,11 @@ export const buildEChartsSeries = (
         chartModel,
         chartModel.yAxisScaleTransforms,
         settings,
-        series,
+        // It's guranteed that no series here will be scatter, since with
+        // scatter plots the `stackable.stack_type` is undefined. We can maybe
+        // remove this later after refactoring the scatter implementation to a
+        // separate codepath.
+        series as (LineSeriesOption | BarSeriesOption)[],
       ),
     );
   }

@@ -151,6 +151,14 @@ export const getCartesianChartModel = (
       renderingContext,
     );
 
+  const stackedLabelsFormatters = getStackedLabelsFormatters(
+    seriesModels,
+    stackModels,
+    transformedDataset,
+    settings,
+    renderingContext,
+  );
+
   const { leftAxisModel, rightAxisModel } = getYAxesModels(
     seriesModels,
     transformedDataset,
