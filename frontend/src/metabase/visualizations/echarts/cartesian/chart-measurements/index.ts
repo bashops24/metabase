@@ -59,6 +59,7 @@ const getYAxisTicksWidth = (
   const [min, max] = axisModel.extent.map(extent =>
     yAxisScaleTransforms.fromEChartsAxisValue(extent),
   );
+  const valuesToMeasure = getValuesToMeasure(min, max);
 
   const isFormattingAutoOrCompact =
     settings["graph.label_value_formatting"] !== "full";
