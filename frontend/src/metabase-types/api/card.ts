@@ -126,7 +126,7 @@ export type TableColumnOrderSetting = {
 };
 
 export type StackType = "stacked" | "normalized" | null;
-export type StackValuesDisplay = "total" | "all" | "insides";
+export type StackValuesDisplay = "total" | "all" | "series";
 
 export const numericScale = ["linear", "pow", "log"] as const;
 export type NumericScale = typeof numericScale[number];
