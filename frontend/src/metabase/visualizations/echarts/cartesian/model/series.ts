@@ -342,7 +342,9 @@ export const getStackedLabelsFormatters = (
 
   const hasDataLabels =
     settings["graph.show_values"] &&
-    settings["stackable.stack_type"] === "stacked";
+    settings["stackable.stack_type"] === "stacked" &&
+    (settings["graph.show_stack_values"] === "total" ||
+      settings["graph.show_stack_values"] === "all");
 
   if (!hasDataLabels) {
     return { formatters, compactStackedSeriesDataKeys };
@@ -397,6 +399,7 @@ export const getStackedLabelsFormatters = (
 
 export const getSeriesLabelsFormatters = (
   seriesModels: SeriesModel[],
+  stackModels: StackModel[],
   dataset: ChartDataset,
   settings: ComputedVisualizationSettings,
   renderingContext: RenderingContext,
@@ -406,16 +409,24 @@ export const getSeriesLabelsFormatters = (
 } => {
   const formatters: SeriesFormatters = {};
   const compactSeriesDataKeys: DataKey[] = [];
+  const stackedSeries = new Set(
+    stackModels.flatMap(stackModel => stackModel.seriesKeys),
+  );
 
   seriesModels.forEach(seriesModel => {
     const seriesSettings =
       settings.series(seriesModel.legacySeriesSettingsObjectKey) ?? {};
 
+    const isStacked = stackedSeries.has(seriesModel.dataKey);
+    const canShowStackedLabelForSeries =
+      settings["graph.show_stack_values"] !== "total" &&
+      seriesSettings.display === "bar";
+    if (isStacked && !canShowStackedLabelForSeries) {
+      return;
+    }
+
     const hasDataLabels =
-      settings["graph.show_values"] &&
-      seriesSettings["show_series_values"] &&
-      (settings["stackable.stack_type"] == null ||
-        seriesSettings.display === "line");
+      settings["graph.show_values"] && seriesSettings["show_series_values"];
 
     if (!hasDataLabels) {
       return;

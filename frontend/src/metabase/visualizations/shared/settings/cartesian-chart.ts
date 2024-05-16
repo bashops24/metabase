@@ -86,6 +86,7 @@ export const isStackingValueValid = (
   );
   return stackableDisplays.length > 1;
 };
+export const getDefaultShowStackValues = () => "total";
 
 export const getDefaultStackingValue = (
   settings: ComputedVisualizationSettings,
