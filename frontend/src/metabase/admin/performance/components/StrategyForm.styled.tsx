@@ -31,4 +31,5 @@ export const FormBox = styled(Box)<BoxProps>`
   border-bottom: 1px solid ${color("border")};
   overflow: auto;
   flex-grow: 1;
+  padding-bottom: 2.5rem;
 `;

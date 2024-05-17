@@ -1,3 +1,4 @@
+import { useMediaQuery } from "@mantine/hooks";
 import { t } from "ttag";
 import { findWhere } from "underscore";
 
@@ -8,9 +9,10 @@ import {
 } from "metabase/admin/performance/strategies";
 import { color } from "metabase/lib/colors";
 import { FixedSizeIcon, Flex, Title, Tooltip, useHover } from "metabase/ui";
+import { breakpoints } from "metabase/ui/theme";
 import type { Config } from "metabase-types/api";
 
-import { PolicyToken } from "./StrategyFormLauncher.styled";
+import { PolicyToken, StyledLauncher } from "./StrategyFormLauncher.styled";
 
 export const StrategyFormLauncher = ({
   forId,
@@ -39,7 +41,7 @@ export const StrategyFormLauncher = ({
   const strategy = savedStrategy ?? rootStrategy;
   const isBeingEdited = targetId === forId;
 
-  const { hovered, ref: hoveredRef } = useHover<HTMLButtonElement>();
+  const { hovered, ref: hoveredRef } = useHover<HTMLDivElement>();
 
   const buttonVariant =
     isBeingEdited || hovered
@@ -58,58 +60,62 @@ export const StrategyFormLauncher = ({
         rootStrategy,
       )})`
     : t`Edit policy for database '${title}' (currently: ${shortStrategyLabel})`;
+
+  const isSmallViewport = useMediaQuery(`(max-width: ${breakpoints.sm})`);
+
+  const launchForm = () => {
+    if (targetId !== forId) {
+      updateTargetId(forId, isFormDirty);
+    }
+  };
+
   return (
-    <Flex
+    <StyledLauncher
+      ref={hoveredRef}
+      fw={forRoot || inheritsRootStrategy ? "normal" : "bold"}
+      bg={color(forRoot ? "bg-medium" : "white")}
       w="100%"
       p="md"
-      bg={color(forRoot ? "bg-medium" : "white")}
-      justify="space-between"
-      align="center"
-      gap="md"
+      aria-label={ariaLabel}
       style={{
         border: forRoot ? undefined : `1px solid ${color("border")}`,
-        borderRadius: ".5rem",
       }}
+      onClick={launchForm}
     >
-      <Flex gap="0.5rem" color="text-medium" align="center">
-        <FixedSizeIcon name={forRoot ? "star" : "database"} color="inherit" />
-        <Title color="inherit" order={6}>
-          {title}
-        </Title>
-      </Flex>
-      <Tooltip
-        position="bottom"
-        disabled={!inheritsRootStrategy}
-        label={t`Using default policy`}
-        events={{
-          hover: true,
-          focus: true,
-          touch: true,
-        }}
+      <Flex
+        w="100%"
+        direction={isSmallViewport ? "column" : "row"}
+        align={isSmallViewport ? "stretch" : "center"}
+        justify="space-between"
+        gap="md"
       >
-        <PolicyToken
-          onClick={() => {
-            if (targetId !== forId) {
-              updateTargetId(forId, isFormDirty);
-            }
-          }}
-          aria-label={ariaLabel}
-          ref={hoveredRef}
-          variant={buttonVariant}
-          fw={forRoot || inheritsRootStrategy ? "normal" : "bold"}
-          p="0.25rem .75rem"
-          mah="3rem"
-          styles={{
-            root: {
-              borderRadius: "7rem",
-            },
-          }}
-        >
-          <Flex wrap="nowrap" lh="1.5rem" gap=".5rem">
-            {shortStrategyLabel}
-          </Flex>
-        </PolicyToken>
-      </Tooltip>
-    </Flex>
+        <Flex gap="0.5rem" color="text-medium" align="center">
+          <FixedSizeIcon name={forRoot ? "star" : "database"} color="inherit" />
+          <Title color="inherit" order={6}>
+            {title}
+          </Title>
+        </Flex>
+        <Flex wrap="nowrap" lh="1.5rem" gap=".5rem">
+          <Tooltip
+            position="bottom"
+            disabled={!inheritsRootStrategy}
+            label={t`Using default policy`}
+          >
+            <PolicyToken
+              onClick={launchForm}
+              aria-label={ariaLabel}
+              variant={buttonVariant}
+              fw={forRoot || inheritsRootStrategy ? "normal" : "bold"}
+              lh="1.5rem"
+              p="0.25rem .75rem"
+              mah="3rem"
+              radius="7rem"
+            >
+              {shortStrategyLabel}
+            </PolicyToken>
+          </Tooltip>
+        </Flex>
+      </Flex>
+    </StyledLauncher>
   );
 };

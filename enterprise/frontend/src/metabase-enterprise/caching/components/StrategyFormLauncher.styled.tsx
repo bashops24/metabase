@@ -4,7 +4,7 @@ import type { HTMLAttributes, MutableRefObject } from "react";
 
 import { color } from "metabase/lib/colors";
 import type { ButtonProps as BaseButtonProps } from "metabase/ui";
-import { Button } from "metabase/ui";
+import { Button, Flex } from "metabase/ui";
 
 type ButtonProps = BaseButtonProps & HTMLAttributes<HTMLButtonElement>;
 export const PolicyToken = styled(Button)<
@@ -16,6 +16,7 @@ export const PolicyToken = styled(Button)<
   padding: 1rem;
   border-width: 1px;
   border-style: solid;
+  justify-content: center;
   ${({ variant }) =>
     css`
       border-color: ${color(
@@ -27,3 +28,22 @@ export const PolicyToken = styled(Button)<
   }
 `;
 PolicyToken.defaultProps = { radius: "sm" };
+
+export const StyledLauncher = styled(Flex)<
+  { variant?: string; ref?: MutableRefObject<HTMLDivElement> } & ButtonProps
+>`
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-flow: row nowrap;
+  padding: 1rem;
+  border-width: 1px;
+  border-style: solid;
+  justify-content: center;
+  ${({ variant }) =>
+    css`
+      border-color: ${color(
+        ["filled", "outline"].includes(variant || "") ? "brand" : "border",
+      )} !important;
+    `};
+`;
