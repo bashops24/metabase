@@ -53,11 +53,10 @@ export function getDefaultDimensionLabel(multipleSeries) {
 }
 
 function canHaveDataLabels(series, vizSettings) {
-  const hasLineSeries = getSeriesDisplays(series, vizSettings).some(
-    display => display === "line",
+  const areAllAreas = getSeriesDisplays(series, vizSettings).every(
+    display => display === "area",
   );
-
-  return hasLineSeries || vizSettings["stackable.stack_type"] !== "normalized";
+  return vizSettings["stackable.stack_type"] !== "normalized" || !areAllAreas;
 }
 
 export const GRAPH_DATA_SETTINGS = {
@@ -335,9 +334,16 @@ export const GRAPH_DISPLAY_VALUES_SETTINGS = {
     section: t`Display`,
     title: t`Stack values to show`,
     widget: "segmentedControl",
-    getHidden: (series, vizSettings) =>
-      vizSettings["graph.show_values"] !== true ||
-      vizSettings["stackable.stack_type"] == null,
+    getHidden: (series, vizSettings) => {
+      const hasBars = getSeriesDisplays(series, vizSettings).some(
+        display => display === "bar",
+      );
+      return (
+        vizSettings["stackable.stack_type"] !== "stacked" ||
+        vizSettings["graph.show_values"] !== true ||
+        !hasBars
+      );
+    },
     props: {
       options: [
         { name: t`Total`, value: "total" },
