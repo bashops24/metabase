@@ -115,13 +115,6 @@ export const getWaterfallChartModel = (
     settings,
   );
 
-  const waterfallLabelFormatter = getWaterfallLabelFormatter(
-    seriesModel,
-    transformedDataset,
-    settings,
-    renderingContext,
-  );
-
   return {
     stackModels: [],
     dataset: originalDatasetWithTotal,
