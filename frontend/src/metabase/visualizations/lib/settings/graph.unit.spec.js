@@ -281,9 +281,7 @@ describe("GRAPH_DISPLAY_VALUES_SETTINGS", () => {
       expect(isHidden).toBe(false);
     });
   });
-});
 
-describe("GRAPH_DISPLAY_VALUES_SETTINGS", () => {
   describe("graph.show_stack_values", () => {
     const getHidden =
       GRAPH_DISPLAY_VALUES_SETTINGS["graph.show_stack_values"].getHidden;
