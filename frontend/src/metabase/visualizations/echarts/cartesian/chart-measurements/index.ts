@@ -27,7 +27,7 @@ const roundToHundredth = (value: number) => Math.ceil(value * 100) / 100;
 
 const getValuesToMeasure = (min: number, max: number): number[] => {
   if (min === max) {
-    return [min, max];
+    return [min];
   }
 
   const stepsCount = 4;
@@ -59,7 +59,6 @@ const getYAxisTicksWidth = (
   const [min, max] = axisModel.extent.map(extent =>
     yAxisScaleTransforms.fromEChartsAxisValue(extent),
   );
-  const valuesToMeasure = getValuesToMeasure(min, max);
 
   const isFormattingAutoOrCompact =
     settings["graph.label_value_formatting"] !== "full";
