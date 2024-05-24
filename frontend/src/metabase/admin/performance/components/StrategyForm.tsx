@@ -248,7 +248,7 @@ const FormButtonsGroup = ({
       className="form-buttons-group"
       style={{
         paddingInlineStart: isInSidebar ? "2rem" : "2.5rem",
-        paddingInlineEnd: isInSidebar ? "13px" : "2.5rem",
+        paddingInlineEnd: isInSidebar ? "1rem" : "2.5rem",
       }}
     >
       {children}
