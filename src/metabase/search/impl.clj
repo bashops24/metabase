@@ -532,6 +532,10 @@
         xf                 (comp
                             (map t2.realize/realize)
                             (map to-toucan-instance)
+                            (map #(if (and (t2/instance-of? :model/Collection %)
+                                           (:trashed_directly %))
+                                    (assoc % :location (collection/trash-path))
+                                    %))
                             (map #(if (t2/instance-of? :model/Collection %)
                                     (t2/hydrate % :effective_location)
                                     (assoc % :effective_location nil)))

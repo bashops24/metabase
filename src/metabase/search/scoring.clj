@@ -119,7 +119,8 @@
    [metabase.public-settings.premium-features :refer [defenterprise]]
    [metabase.search.config :as search.config]
    [metabase.search.util :as search.util]
-   [metabase.util :as u]))
+   [metabase.util :as u]
+   [metabase.models.collection :as collection]))
 
 (defn- matches?
   [search-token match-token]
@@ -308,7 +309,8 @@
 (defn serialize
   "Massage the raw result from the DB and match data into something more useful for the client"
   [{:as result :keys [all-scores relevant-scores name display_name collection_id collection_name
-                      collection_authority_level collection_type collection_effective_ancestors]}]
+                      collection_authority_level collection_type collection_effective_ancestors
+                      trashed_directly model]}]
   (let [matching-columns    (into #{} (remove nil? (map :column relevant-scores)))
         match-context-thunk (first (keep :match-context-thunk relevant-scores))]
     (-> result
@@ -320,12 +322,15 @@
                                     (empty?
                                      (remove matching-columns search.config/displayed-columns)))
                            (match-context-thunk))
-         :collection     (merge {:id              collection_id
-                                 :name            collection_name
-                                 :authority_level collection_authority_level
-                                 :type            collection_type}
+         :collection     (if (and trashed_directly (not= "collection" model))
+                           (select-keys (collection/trash-collection)
+                                        [:id :name :authority_level :type])
+                           (merge {:id              collection_id
+                                   :name            collection_name
+                                   :authority_level collection_authority_level
+                                   :type            collection_type}
                                 (when collection_effective_ancestors
-                                  {:effective_ancestors collection_effective_ancestors}))
+                                  {:effective_ancestors collection_effective_ancestors})))
          :scores          all-scores)
         (update :dataset_query (fn [dataset-query]
                                  (when-let [query (some-> dataset-query json/parse-string)]
@@ -340,6 +345,7 @@
          :collection_location
          :collection_name
          :collection_type
+         :trashed_directly
          :display_name))))
 
 (defn weights-and-scores
