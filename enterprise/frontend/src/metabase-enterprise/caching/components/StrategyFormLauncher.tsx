@@ -1,4 +1,3 @@
-import { useMediaQuery } from "@mantine/hooks";
 import { t } from "ttag";
 import { findWhere } from "underscore";
 
@@ -8,7 +7,6 @@ import {
   rootId,
 } from "metabase/admin/performance/strategies";
 import { FixedSizeIcon, Flex, Title, Tooltip, useHover } from "metabase/ui";
-import { breakpoints } from "metabase/ui/theme";
 import type { Config } from "metabase-types/api";
 
 import { PolicyToken, StyledLauncher } from "./StrategyFormLauncher.styled";
@@ -60,8 +58,6 @@ export const StrategyFormLauncher = ({
       )})`
     : t`Edit policy for database '${title}' (currently: ${shortStrategyLabel})`;
 
-  const isSmallViewport = useMediaQuery(`(max-width: ${breakpoints.sm})`);
-
   const launchForm = () => {
     if (targetId !== forId) {
       updateTargetId(forId, isFormDirty);
@@ -75,8 +71,6 @@ export const StrategyFormLauncher = ({
       onClick={launchForm}
       forRoot={forRoot}
       inheritsRootStrategy={inheritsRootStrategy}
-      direction={isSmallViewport ? "column" : "row"}
-      align={isSmallViewport ? "stretch" : "center"}
       justify="space-between"
       gap="md"
     >

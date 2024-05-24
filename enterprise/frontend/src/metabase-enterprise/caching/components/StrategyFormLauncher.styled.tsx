@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 import type { HTMLAttributes, MutableRefObject } from "react";
 
 import { color } from "metabase/lib/colors";
+import { breakpointMaxSmall } from "metabase/styled-components/theme";
 import type { ButtonProps as BaseButtonProps } from "metabase/ui";
 import { Button, Flex } from "metabase/ui";
 
@@ -26,6 +27,9 @@ export const PolicyToken = styled(Button)<
   span {
     gap: 0.5rem;
   }
+  ${breakpointMaxSmall} {
+    flex: 1;
+  }
 `;
 PolicyToken.defaultProps = { radius: "sm" };
 
@@ -46,7 +50,6 @@ export const StyledLauncher = styled(Flex)<
   border-style: solid;
   justify-content: center;
   width: 100%;
-  padding: 1rem;
   ${({ variant }) =>
     css`
       border-color: ${color(
@@ -57,4 +60,11 @@ export const StyledLauncher = styled(Flex)<
     forRoot || inheritsRootStrategy ? "normal" : "bold"};
   background-color: ${({ forRoot }) => color(forRoot ? "bg-medium" : "white")};
   ${({ forRoot }) => (forRoot ? "" : `border: 1px solid ${color("border")}`)};
+  flex-direction: row;
+  align-items: center;
+  ${breakpointMaxSmall} {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
 `;
