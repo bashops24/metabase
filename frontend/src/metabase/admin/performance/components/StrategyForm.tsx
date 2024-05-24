@@ -170,7 +170,7 @@ const StrategyFormBody = ({
           className="strategy-form-box"
           style={{
             paddingInlineStart: isInSidebar ? "2rem" : "2.5rem",
-            paddingInlineEnd: isInSidebar ? "13px" : "2.5rem",
+            paddingInlineEnd: isInSidebar ? "1rem" : "2.5rem",
           }}
         >
           {shouldShowName && (

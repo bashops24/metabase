@@ -30,7 +30,12 @@ export const PolicyToken = styled(Button)<
 PolicyToken.defaultProps = { radius: "sm" };
 
 export const StyledLauncher = styled(Flex)<
-  { variant?: string; ref?: MutableRefObject<HTMLDivElement> } & ButtonProps
+  {
+    forRoot?: boolean;
+    inheritsRootStrategy?: boolean;
+    variant?: string;
+    ref?: MutableRefObject<HTMLDivElement>;
+  } & ButtonProps
 >`
   border-radius: 0.5rem;
   cursor: pointer;
@@ -40,10 +45,16 @@ export const StyledLauncher = styled(Flex)<
   border-width: 1px;
   border-style: solid;
   justify-content: center;
+  width: 100%;
+  padding: 1rem;
   ${({ variant }) =>
     css`
       border-color: ${color(
         ["filled", "outline"].includes(variant || "") ? "brand" : "border",
       )} !important;
     `};
+  font-weight: ${({ forRoot, inheritsRootStrategy }) =>
+    forRoot || inheritsRootStrategy ? "normal" : "bold"};
+  background-color: ${({ forRoot }) => color(forRoot ? "bg-medium" : "white")};
+  ${({ forRoot }) => (forRoot ? "" : `border: 1px solid ${color("border")}`)};
 `;
