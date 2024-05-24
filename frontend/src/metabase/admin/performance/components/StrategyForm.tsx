@@ -351,12 +351,10 @@ const SaveAndDiscardButtons = ({
   dirty,
   isFormPending,
   buttonLabels,
-  isInSidebar,
 }: {
   dirty: boolean;
   isFormPending: boolean;
   buttonLabels: ButtonLabels;
-  isInSidebar?: boolean;
 }) => {
   return (
     <>
@@ -376,13 +374,6 @@ const SaveAndDiscardButtons = ({
         variant="filled"
         data-testid="strategy-form-submit-button"
         className="strategy-form-submit-button"
-        styles={
-          isInSidebar
-            ? {
-                root: { flex: 1 },
-              }
-            : undefined
-        }
       />
     </>
   );
