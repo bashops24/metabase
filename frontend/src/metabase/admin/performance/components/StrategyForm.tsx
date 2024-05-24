@@ -166,13 +166,7 @@ const StrategyFormBody = ({
   return (
     <FormWrapper>
       <StyledForm style={{ overflow: isInSidebar ? undefined : "auto" }}>
-        <FormBox
-          className="strategy-form-box"
-          style={{
-            paddingInlineStart: isInSidebar ? "2rem" : "2.5rem",
-            paddingInlineEnd: isInSidebar ? "1rem" : "2.5rem",
-          }}
-        >
+        <FormBox className="strategy-form-box">
           {shouldShowName && (
             <Box lh="1rem" pt="md" color="text-medium">
               <Group spacing="sm">
