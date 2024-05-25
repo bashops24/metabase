@@ -37,7 +37,10 @@ import type {
 } from "metabase/visualizations/types";
 import type { SeriesSettings } from "metabase-types/api";
 
-import type { ChartMeasurements } from "../chart-measurements/types";
+import type {
+  ChartMeasurements,
+  TicksRotation,
+} from "../chart-measurements/types";
 import {
   isCategoryAxis,
   isNumericAxis,
@@ -88,6 +91,7 @@ export const getBarInsideLabelLayout =
     dataset: ChartDataset,
     settings: ComputedVisualizationSettings,
     seriesDataKey: DataKey,
+    ticksRotation?: TicksRotation,
   ): BarSeriesOption["labelLayout"] =>
   params => {
     const { dataIndex, rect, labelRect } = params;
@@ -95,10 +99,32 @@ export const getBarInsideLabelLayout =
       return {};
     }
 
-    const canFitWithoutRotation =
-      rect.width > labelRect.width && rect.height > labelRect.height;
+    // HACK: On the first render, labelRect values are provided as if the label has not been rotated.
+    // If we decide to rotate it here, labelRect will be computed for the already rotated label on the next render.
+    // Since we can't determine whether it's the initial render or if labelRect is computed for a rotated label,
+    // we need to figure out the actual text width of the label based on the known side of the rectangle, which is the text size.
+    const labelTextWidth =
+      labelRect.width === CHART_STYLE.seriesLabels.size
+        ? labelRect.height
+        : labelRect.width;
+    const paddedLabelTextWidth =
+      CHART_STYLE.seriesLabels.stackedPadding * 2 + labelTextWidth;
+    const paddedLabelTextHeight =
+      CHART_STYLE.seriesLabels.stackedPadding * 2 +
+      CHART_STYLE.seriesLabels.size;
 
-    if (!canFitWithoutRotation) {
+    let canFit = false;
+    if (ticksRotation === "horizontal") {
+      canFit =
+        rect.width > paddedLabelTextWidth &&
+        rect.height > paddedLabelTextHeight;
+    } else if (ticksRotation === "vertical") {
+      canFit =
+        rect.height > paddedLabelTextWidth &&
+        rect.width > paddedLabelTextHeight;
+    }
+
+    if (!canFit) {
       return {
         fontSize: 0,
       };
@@ -111,6 +137,7 @@ export const getBarInsideLabelLayout =
 
     return {
       hideOverlap: settings["graph.label_value_frequency"] === "fit",
+      rotate: ticksRotation === "vertical" ? 90 : 0,
     };
   };
 
@@ -301,7 +328,12 @@ const buildEChartsBarSeries = (
           labelFormatter,
         ),
     labelLayout: isStacked
-      ? getBarInsideLabelLayout(dataset, settings, seriesModel.dataKey)
+      ? getBarInsideLabelLayout(
+          dataset,
+          settings,
+          seriesModel.dataKey,
+          chartMeasurements.stackedBarTicksRotation,
+        )
       : getBarLabelLayout(dataset, settings, seriesModel.dataKey),
     itemStyle: {
       color: seriesModel.color,
