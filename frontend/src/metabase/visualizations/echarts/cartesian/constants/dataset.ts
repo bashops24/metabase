@@ -28,6 +28,8 @@ export const TICKS_INTERVAL_THRESHOLD = 3;
 // value for nulls.
 export const ECHARTS_CATEGORY_AXIS_NULL_VALUE = `${NULL_CHAR}_NULL` as const;
 
+export const BAR_ZERO_Y_VALUE = `${NULL_CHAR}_ZERO`;
+
 export const GOAL_LINE_SERIES_ID = `${NULL_CHAR}_goal_line` as const;
 
 export const TIMELINE_EVENT_SERIES_ID = `${NULL_CHAR}_timeline_events`;

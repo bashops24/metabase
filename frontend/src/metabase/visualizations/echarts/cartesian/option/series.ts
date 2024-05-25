@@ -6,6 +6,7 @@ import _ from "underscore";
 import { getObjectValues } from "metabase/lib/objects";
 import { isNotNull } from "metabase/lib/types";
 import {
+  BAR_ZERO_Y_VALUE,
   NEGATIVE_STACK_TOTAL_DATA_KEY,
   POSITIVE_STACK_TOTAL_DATA_KEY,
   X_AXIS_DATA_KEY,
@@ -185,6 +186,33 @@ const buildEChartsBarSeries = (
   labelFormatter: LabelFormatter | undefined,
   renderingContext: RenderingContext,
 ): BarSeriesOption => {
+  const zeroMarkPointsData = dataset
+    .filter(datum => datum[seriesModel.dataKey] === BAR_ZERO_Y_VALUE)
+    .map(datum => ({
+      xAxis: datum[X_AXIS_DATA_KEY],
+      yAxis: 0,
+    }));
+
+  const labelOptions = buildEChartsLabelOptions(
+    seriesModel,
+    yAxisScaleTransforms,
+    renderingContext,
+    labelFormatter,
+  );
+
+  const markPoint = {
+    symbol: "circle",
+    symbolSize: 1,
+    label: {
+      show: true,
+      formatter: "0",
+      color: "#000",
+      fontSize: 14,
+      position: "top",
+    },
+    data: zeroMarkPointsData,
+  };
+
   return {
     id: seriesModel.dataKey,
     emphasis: {
@@ -202,6 +230,7 @@ const buildEChartsBarSeries = (
     type: "bar",
     z: CHART_STYLE.series.zIndex,
     yAxisIndex,
+    barMinHeight: 1,
     barGap: 0,
     stack: stackName,
     barWidth: computeBarWidth(
@@ -214,16 +243,12 @@ const buildEChartsBarSeries = (
       y: seriesModel.dataKey,
       x: X_AXIS_DATA_KEY,
     },
-    label: buildEChartsLabelOptions(
-      seriesModel,
-      yAxisScaleTransforms,
-      renderingContext,
-      labelFormatter,
-    ),
+    label: labelOptions,
     labelLayout: getBarLabelLayout(dataset, settings, seriesModel.dataKey),
     itemStyle: {
       color: seriesModel.color,
     },
+    markPoint,
   };
 };
 

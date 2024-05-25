@@ -5,6 +5,7 @@ import { parseTimestamp } from "metabase/lib/time-dayjs";
 import { checkNumber, isNotNull } from "metabase/lib/types";
 import { isEmpty } from "metabase/lib/validate";
 import {
+  BAR_ZERO_Y_VALUE,
   ECHARTS_CATEGORY_AXIS_NULL_VALUE,
   NEGATIVE_STACK_TOTAL_DATA_KEY,
   ORIGINAL_INDEX_DATA_KEY,
@@ -291,6 +292,27 @@ export const getNullReplacerTransform = (
     const transformedDatum = { ...datum };
     for (const key of replaceNullsWithZeroDataKeys) {
       transformedDatum[key] = datum[key] != null ? datum[key] : 0;
+    }
+    return transformedDatum;
+  };
+};
+
+export const getBarZeroReplacerTransform = (
+  settings: ComputedVisualizationSettings,
+  seriesModels: SeriesModel[],
+): TransformFn => {
+  const replaceBarZerosWithNullsDataKeys = seriesModels
+    .filter(
+      seriesModel =>
+        settings.series(seriesModel.legacySeriesSettingsObjectKey).display ===
+        "bar",
+    )
+    .map(seriesModel => seriesModel.dataKey);
+
+  return datum => {
+    const transformedDatum = { ...datum };
+    for (const key of replaceBarZerosWithNullsDataKeys) {
+      transformedDatum[key] = datum[key] === 0 ? BAR_ZERO_Y_VALUE : datum[key];
     }
     return transformedDatum;
   };
@@ -674,6 +696,10 @@ export const applyVisualizationSettingsDataTransformations = (
         stackModels.find(stackModel => stackModel.display === "area")
           ?.seriesKeys ?? [],
       ),
+    },
+    {
+      condition: true, // non stacked & data labels enabled
+      fn: getBarZeroReplacerTransform(settings, seriesModels),
     },
   ]);
 };
