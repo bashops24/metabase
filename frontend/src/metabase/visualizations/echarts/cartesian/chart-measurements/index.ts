@@ -582,6 +582,7 @@ const countFittingLabels = (
   );
 };
 
+const BAR_WIDTH_PRECISION = 0.85;
 const HORIZONTAL_LABELS_COUNT_THRESHOLD = 0.8;
 
 const getStackedBarTicksRotation = (
@@ -598,7 +599,9 @@ const getStackedBarTicksRotation = (
   }
 
   const barWidth =
-    getDimensionWidth(chartModel, boundaryWidth) * CHART_STYLE.series.barWidth;
+    getDimensionWidth(chartModel, boundaryWidth) *
+    CHART_STYLE.series.barWidth *
+    BAR_WIDTH_PRECISION;
 
   if (barWidth < CHART_STYLE.seriesLabels.size) {
     return;

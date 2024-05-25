@@ -703,6 +703,13 @@ BarStackedSeriesLabelsNoTotals.args = {
   renderingContext,
 };
 
+export const BarStackedSeriesLabelsRotated = Template.bind({});
+BarStackedSeriesLabelsRotated.args = {
+  rawSeries: data.barStackedSeriesLabelsRotated as any,
+  dashcardSettings: {},
+  renderingContext,
+};
+
 export const Default = Template.bind({});
 Default.args = {
   rawSeries: data.messedUpAxis as any,

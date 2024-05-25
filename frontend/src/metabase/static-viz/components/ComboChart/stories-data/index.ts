@@ -34,6 +34,7 @@ import barStackedPowYAxisNegatives from "./bar-stacked-pow-y-axis-negatives.json
 import barStackedPowYAxis from "./bar-stacked-pow-y-axis.json";
 import barStackedSeriesLabelsAndTotals from "./bar-stacked-series-labels-and-totals.json";
 import barStackedSeriesLabelsNoTotals from "./bar-stacked-series-labels-no-totals.json";
+import barStackedSeriesLabelsRotated from "./bar-stacked-series-labels-rotated.json";
 import barStackedTotalFormattedValues from "./bar-stacked-total-formatted-values.json";
 import barTwoAxesStackedWithNegativeValues from "./bar-two-axes-stacked-with-negative-values.json";
 import barTwoDaysOfWeek from "./bar-two-days-of-week.json";
@@ -199,4 +200,5 @@ export const data = {
   barStackedNormalizedSeriesLabels,
   barStackedSeriesLabelsAndTotals,
   barStackedSeriesLabelsNoTotals,
+  barStackedSeriesLabelsRotated,
 };
