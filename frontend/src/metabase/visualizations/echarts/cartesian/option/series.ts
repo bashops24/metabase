@@ -164,6 +164,7 @@ export const buildEChartsLabelOptions = (
   position?: "top" | "bottom" | "inside",
 ): SeriesLabelOption => {
   return {
+    show: !!formatter,
     silent: true,
     position,
     opacity: 1,
