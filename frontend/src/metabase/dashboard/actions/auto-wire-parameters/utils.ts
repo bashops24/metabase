@@ -17,6 +17,7 @@ import type {
   DashCardId,
   ParameterId,
   ParameterTarget,
+  DashboardTabId,
 } from "metabase-types/api";
 import type { DashboardState } from "metabase-types/store";
 
@@ -26,18 +27,22 @@ export function getAllDashboardCardsWithUnmappedParameters({
   dashboardState,
   dashboardId,
   parameterId,
+  selectedTabId,
   excludeDashcardIds = [],
 }: {
   dashboardState: DashboardState;
   dashboardId: DashboardId;
   parameterId: ParameterId;
+  selectedTabId: DashboardTabId;
   excludeDashcardIds?: DashCardId[];
 }): QuestionDashboardCard[] {
   const dashCards = getExistingDashCards(
     dashboardState.dashboards,
     dashboardState.dashcards,
     dashboardId,
+    selectedTabId,
   );
+
   return dashCards.filter(
     (dashcard): dashcard is QuestionDashboardCard =>
       isQuestionDashCard(dashcard) &&

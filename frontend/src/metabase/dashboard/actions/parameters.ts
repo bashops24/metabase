@@ -27,7 +27,6 @@ import type {
   ParameterId,
   ParameterMappingOptions,
   ParameterTarget,
-  QuestionDashboardCard,
   ValuesQueryType,
   ValuesSourceConfig,
   ValuesSourceType,
@@ -51,6 +50,7 @@ import {
   getParameters,
   getParameterValues,
   getParameterMappingsBeforeEditing,
+  getSelectedTabId,
 } from "../selectors";
 import { isQuestionDashCard } from "../utils";
 
@@ -167,12 +167,20 @@ export const setParameterMapping = createThunkAction(
 
       const dashcard = getDashCardById(getState(), dashcardId);
 
-      if (target !== null && isQuestionDashCard(dashcard)) {
+      if (!isQuestionDashCard(dashcard)) {
+        // proceed only with question dashcards
+        return;
+      }
+
+      if (target !== null) {
+        const selectedTabId = getSelectedTabId(getState());
+
         dispatch(
           autoWireDashcardsWithMatchingParameters(
             parameterId,
             dashcard,
             target,
+            selectedTabId,
           ),
         );
       }
@@ -182,8 +190,7 @@ export const setParameterMapping = createThunkAction(
           id: dashcardId,
           attributes: {
             parameter_mappings: getParameterMappings(
-              // TODO remove type casting when getParameterMappings is fixed
-              dashcard as QuestionDashboardCard,
+              dashcard,
               parameterId,
               cardId,
               target,

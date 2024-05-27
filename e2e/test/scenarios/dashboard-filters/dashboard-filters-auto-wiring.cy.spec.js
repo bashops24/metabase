@@ -159,7 +159,7 @@ describe("dashboard filters auto-wiring", () => {
       undoToast().should("not.exist");
     });
 
-    it("should autowire parameters to cards in different tabs", () => {
+    it("should not autowire parameters to cards in different tabs", () => {
       createDashboardWithCards({ cards }).then(dashboardId => {
         visitDashboardAndCreateTab({
           dashboardId,
@@ -179,14 +179,10 @@ describe("dashboard filters auto-wiring", () => {
       goToTab("Tab 1");
 
       for (let i = 0; i < cards.length; i++) {
-        getDashboardCard(i).findByText("User.Name").should("exist");
+        getDashboardCard(i).findByText("User.Name").should("not.exist");
       }
 
-      undoToast()
-        .findByText(
-          "This filter has been auto-connected with questions with the same field.",
-        )
-        .should("be.visible");
+      undoToast().should("not.exist");
     });
 
     it("should undo parameter wiring when 'Undo auto-connection' is clicked", () => {

@@ -24,6 +24,7 @@ import type {
   DashCardId,
   ParameterId,
   ParameterTarget,
+  DashboardTabId,
 } from "metabase-types/api";
 import type { Dispatch, GetState, StoreDashcard } from "metabase-types/store";
 
@@ -31,6 +32,7 @@ export function autoWireDashcardsWithMatchingParameters(
   parameter_id: ParameterId,
   dashcard: QuestionDashboardCard,
   target: ParameterTarget,
+  selectedTabId: DashboardTabId,
 ) {
   return function (dispatch: Dispatch, getState: GetState) {
     const metadata = getMetadata(getState());
@@ -45,6 +47,8 @@ export function autoWireDashcardsWithMatchingParameters(
       dashboardState: dashboard_state,
       dashboardId: dashboard_state.dashboardId,
       parameterId: parameter_id,
+      selectedTabId,
+      // exclude current dashcard as it's being updated in another action
       excludeDashcardIds: [dashcard.id],
     });
 
@@ -98,22 +102,6 @@ export function autoWireParametersToNewCard({
       return;
     }
 
-    const questions = getQuestions(getState());
-
-    const dashcards = getExistingDashCards(
-      dashboardState.dashboards,
-      dashboardState.dashcards,
-      dashboardId,
-    );
-
-    const dashcardWithQuestions: Array<[StoreDashcard, Question]> =
-      dashcards.map(dashcard => [
-        dashcard,
-        isQuestionDashCard(dashcard)
-          ? questions[dashcard.card.id] ?? new Question(dashcard.card, metadata)
-          : new Question(dashcard.card, metadata),
-      ]);
-
     const targetDashcard: StoreDashcard = getDashCardById(
       getState(),
       dashcard_id,
@@ -122,6 +110,22 @@ export function autoWireParametersToNewCard({
     if (!targetDashcard || !isQuestionDashCard(targetDashcard)) {
       return;
     }
+
+    const dashcards = getExistingDashCards(
+      dashboardState.dashboards,
+      dashboardState.dashcards,
+      dashboardId,
+    );
+
+    const questions = getQuestions(getState());
+
+    const dashcardsWithQuestions: Array<[StoreDashcard, Question]> =
+      dashcards.map(dashcard => [
+        dashcard,
+        isQuestionDashCard(dashcard)
+          ? questions[dashcard.card.id] ?? new Question(dashcard.card, metadata)
+          : new Question(dashcard.card, metadata),
+      ]);
 
     const dashcardMappingOptions = getParameterMappingOptions(
       questions[targetDashcard.card.id] ??
@@ -139,7 +143,7 @@ export function autoWireParametersToNewCard({
     const processedParameterIds = new Set();
 
     for (const opt of dashcardMappingOptions) {
-      for (const [dashcard, question] of dashcardWithQuestions) {
+      for (const [dashcard, question] of dashcardsWithQuestions) {
         const param = dashcard.parameter_mappings?.find(mapping =>
           compareMappingOptionTargets(
             mapping.target,
