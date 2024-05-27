@@ -1,12 +1,24 @@
+import type { Location } from "history";
 import { useEffect } from "react";
+import { replace } from "react-router-redux";
+import _ from "underscore";
 
 import { IS_EMBED_PREVIEW } from "metabase/lib/embed";
-import { buildSearchString } from "metabase/lib/urls";
+import { useDispatch } from "metabase/lib/redux";
+import { isNotNull } from "metabase/lib/types";
+import { extractQueryParams } from "metabase/lib/urls";
 
-export function useSyncedQueryString(
-  fn: () => Record<string, any>,
-  deps?: any[],
-) {
+const QUERY_PARAMS_ALLOW_LIST = ["objectId", "tab"];
+
+export const useSyncedQueryString = ({
+  location,
+  object,
+}: {
+  location: Location;
+  object: Record<string, unknown>;
+}) => {
+  const dispatch = useDispatch();
+
   useEffect(() => {
     /**
      * We don't want to sync the query string to the URL because when previewing,
@@ -17,43 +29,24 @@ export function useSyncedQueryString(
     if (IS_EMBED_PREVIEW) {
       return;
     }
-    const object = fn();
-    const searchString = buildSearchString({
-      object,
-      filterFn: containsAllowedParams,
-    });
 
-    if (searchString !== window.location.search) {
-      history.replaceState(
-        null,
-        document.title,
-        window.location.pathname + searchString + window.location.hash,
-      );
-    }
-
-    return () => {
-      // Remove every previously-synced keys from the query string when the component is unmounted.
-      // This is a workaround to clear the parameter list state when [SyncedParametersList] unmounts.
-      const searchString = buildSearchString({
-        filterFn: key => !(key in object),
-      });
-
-      if (searchString !== window.location.search) {
-        history.replaceState(
-          null,
-          document.title,
-          window.location.pathname + searchString + window.location.hash,
-        );
-      }
+    const newLocationObject = {
+      ..._.pick(location.query, QUERY_PARAMS_ALLOW_LIST),
+      ..._.pick(object, isNotNull),
     };
 
-    // exhaustive-deps is enabled for useSyncedQueryString so we don't need to include `fn` as a dependency
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deps]);
-}
-
-const QUERY_PARAMS_ALLOW_LIST = ["objectId", "tab"];
-
-const containsAllowedParams = (objectKey: string) => {
-  return QUERY_PARAMS_ALLOW_LIST.includes(objectKey);
+    if (
+      !_.isEqual(
+        extractQueryParams(newLocationObject).sort(),
+        extractQueryParams(location.query).sort(),
+      )
+    ) {
+      dispatch(
+        replace({
+          ...location,
+          query: newLocationObject,
+        }),
+      );
+    }
+  }, [dispatch, location, object]);
 };
